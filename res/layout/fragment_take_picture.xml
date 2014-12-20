@@ -1,0 +1,38 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="20dp"
+    android:layout_marginRight="20dp"
+    android:layout_marginTop="20dp"
+    android:layout_marginBottom="20dp"
+    android:background="@drawable/activity_screen_background"
+    tools:context="com.br.logsocial.fragments.TakePictureFragment">
+    
+    <TextView
+        android:id="@+id/instrucao_fotografia"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_gravity="top"
+        android:gravity="center"
+        android:text="Ao fotografar, enquadre as informações abaixo"
+        android:textSize="20dp" />
+    
+    <ImageView
+       android:id="@+id/imageView1"
+       android:layout_gravity="top"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:src="@drawable/exemplo_nf" />
+    
+    <Button 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center"
+        android:src="@drawable/take_picture_button"
+        android:background="@drawable/take_picture_button"
+        android:id="@+id/takePictureButton"/>
+    
+    
+
+</FrameLayout>

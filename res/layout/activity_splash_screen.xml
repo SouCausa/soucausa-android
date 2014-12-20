@@ -1,0 +1,19 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/splash_screen_background"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:context=".SplashScreen" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="192dp"
+        android:layout_height="140dp"
+        android:layout_gravity="center"
+        android:layout_weight="0.03"
+        android:src="@drawable/soucausa_logo" />
+
+</LinearLayout>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	
+    <string name="app_id">712566802149125</string>
+    <string name="app_name">Sou Causa</string>
+    <string name="pontos">Pontos</string>
+    <string name="app_photo_sent">Gamefication</string>
+    <string name="action_settings">Settings</string>
+    <string name="chooseTitle">Escolha como quer doar</string>
+    <string name="title_activity_list_ongs">ListOngs</string>
+    <string name="title_activity_splash_screen">SplashScreen</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">Salve Cupom</string>
+    <string name="title_activity_escolha_modo">EscolhaModo</string>
+    <string name="chooseCameraButton">Tirar foto</string>
+    <string name="chooseTypeButton">Digitar</string>
+    <string name="cupomFormTitle">Digite as informações abaixo</string>
+    <string name="hello_blank_fragment">Instruções sobre como tirar a foto</string>
+    <string name="hello_take_picture_button">Fotografar Nota</string>
+    <string name="agradecer_doacao">Obrigado pela doação</string>
+
+    <string-array name="Actions">
+        <item>Enviar foto</item>
+        <item>Digitar nota</item>
+        <item>Sou Causa Social</item>
+        <item>Sobre Causas</item>
+    </string-array>
+
+    <string-array name="ImagensCausa">
+        <item>Adolescente - Proteção Social</item>
+    </string-array>
+    
+    <string name="title_main_screen">Sou Causa</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_thank_you">Obrigado</string>
+
+</resources>

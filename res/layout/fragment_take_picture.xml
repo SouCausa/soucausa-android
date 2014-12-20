@@ -7,7 +7,7 @@
     android:layout_marginTop="20dp"
     android:layout_marginBottom="20dp"
     android:background="@drawable/activity_screen_background"
-    tools:context="com.br.logsocial.fragments.TakePictureFragment">
+    tools:context="com.br.soucausa.fragments.TakePictureFragment">
     
     <TextView
         android:id="@+id/instrucao_fotografia"

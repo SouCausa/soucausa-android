@@ -24,29 +24,29 @@
         
 <!--         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/app_id"/> -->
         
-        <receiver android:name=".receiver.UpdateReceiver" >
+        <receiver android:name="com.br.soucausa.receivers.UpdateReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
         <service
-            android:name=".services.SendPhotoService"
+            android:name="com.br.soucausa.services.SendPhotoService"
             android:enabled="true" />
 
         <provider
-            android:name="com.br.data.OngDataProvider"
+            android:name="com.br.soucausa.data.OngDataProvider"
             android:authorities="com.br.data.OngDataProvider" >
         </provider>
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.br.soucausa.MainActivity"
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".SplashScreen"
+            android:name="com.br.soucausa.SplashScreen"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/NoActionBar" >
@@ -57,12 +57,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainScreen"
+            android:name="com.br.soucausa.MainScreen"
             android:label="@string/title_main_screen"
             android:screenOrientation="portrait" >
         </activity>
         <activity
-            android:name=".ThankYouActivity"
+            android:name="com.br.soucausa.ThankYouActivity"
             android:label="@string/title_activity_thank_you" >
         </activity>
     </application>

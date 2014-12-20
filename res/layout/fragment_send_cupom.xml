@@ -6,7 +6,7 @@
     android:layout_marginLeft="20dp"
     android:layout_marginRight="20dp"
     android:orientation="vertical"
-    tools:context="com.br.logsocial.fragments.TypeCupomFragment" >
+    tools:context="com.br.soucausa.fragments.TypeCupomFragment" >
     
     <TextView
         android:id="@+id/TextView01"

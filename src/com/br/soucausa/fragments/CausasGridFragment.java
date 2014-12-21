@@ -78,7 +78,6 @@ public class CausasGridFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
 				// TODO Auto-generated method stub
 				mListener.onFragmentInteraction(Integer.toString(position));
-//				Log.d("SouCausa","item position: " + position + " Item id: "+id);
 			}
 			
 		});
@@ -92,7 +91,7 @@ public class CausasGridFragment extends Fragment {
 		public void onFragmentInteraction(String id);
 	}
 	
-	class CausasGridAdapter extends BaseAdapter {
+	private class CausasGridAdapter extends BaseAdapter {
 		Context mContext;
 		
 		CausasGridAdapter(Context context) {
@@ -145,7 +144,7 @@ public class CausasGridFragment extends Fragment {
 			{
 				 //first time getView get called
 				LayoutInflater lf = (LayoutInflater) this.mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				item = lf.inflate(R.layout.causa_gridview_item, parent,false); //Expensive Operation
+				item = lf.inflate(R.layout.causa_gridview_item, parent,false); //Expensive Operation... need to be cached
 				viewholder = new ViewHolder(item);
 				item.setTag(viewholder);
 			}

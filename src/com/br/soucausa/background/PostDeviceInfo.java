@@ -86,7 +86,6 @@ public class PostDeviceInfo extends AsyncTask<Bundle, Void, Void> {
 			
 			
 		} catch (JSONException e) {
-			Log.d(TAG,"Deu bosta ao adicionar no JSON");
 			e.printStackTrace();
 		} catch (UnsupportedEncodingException e) {
 			// TODO Auto-generated catch block

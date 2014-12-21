@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.br.logsocial.R;
 import com.br.soucausa.fragments.CausasGridFragment;
-import com.br.soucausa.fragments.GamificationFragment;
 import com.br.soucausa.fragments.TakePictureFragment;
 import com.br.soucausa.listeners.TabListener;
 import com.br.soucausa.util.Pontuacao;
@@ -23,7 +22,6 @@ import com.br.soucausa.util.UserPreference;
 public class MainScreen extends FragmentActivity implements CausasGridFragment.OnFragmentInteractionListener, TakePictureFragment.OnPictureFragmentInteractionListener{
 
 	ActionBar.Tab takePictureTab, sendCupomTab, gameficationTab, causasTab, causasGridTab;
-	GamificationFragment gamificationFragment;
 //	TypeCupomFragment sendCupomFragment;
 	TakePictureFragment takePictureFragment;
 	CausasGridFragment causasGridFragment;
@@ -103,10 +101,6 @@ public class MainScreen extends FragmentActivity implements CausasGridFragment.O
 		userPref.setCausaId(id);
 		displayCausaOnActionBar();
 	}
-
-	public String getCausaId() {
-		return causaId;
-	}
 	
 	public void displayCausaOnActionBar() {
 
@@ -115,47 +109,18 @@ public class MainScreen extends FragmentActivity implements CausasGridFragment.O
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
 				| ActionBar.DISPLAY_SHOW_HOME);
 		
-		TextView acTvPontuacao = (TextView)findViewById(
-				R.id.AcTvPontuacao);
+		TextView acTvPontuacao = (TextView)findViewById(R.id.AcTvPontuacao);
 		
 		UserPreference userPref = new UserPreference(this);
 		int causaId = Integer.parseInt(userPref.getCausaId());
 		if ( CausasGridFragment.causasImg != null && CausasGridFragment.causasImg.size() > 0 )
 		{
-			
 			String msg = CausasGridFragment.causasImg.get(causaId).getDescription();
 			acTvPontuacao.setText(msg);
 		}
 	}
 	
-	public void displayPontuacaoOnActionBar() {
-		Pontuacao pontuacao = new Pontuacao(this);
-		int pontos = pontuacao.getPontuacao();
-
-		ActionBar actionBar = getActionBar();
-		actionBar.setCustomView(R.layout.custom_actionbar);
-		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM
-				| ActionBar.DISPLAY_SHOW_HOME);
-		TextView acTvPontuacao = (TextView)findViewById(
-				R.id.AcTvPontuacao);
-		String msg = null;
-		if (pontos > 1)
-			msg = Integer.toString(pontos) + " Pontos";
-		else
-			msg = Integer.toString(pontos) + " Ponto";
-
-		acTvPontuacao.setText(msg);
-
-		acTvPontuacao.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Toast.makeText(v.getContext(), "Click na pontuação",
-						Toast.LENGTH_SHORT).show();
-			}
-		});
+	public String getCausaId() {
+		return causaId;
 	}
-	
-
 }

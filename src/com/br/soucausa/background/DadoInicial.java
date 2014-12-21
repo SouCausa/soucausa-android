@@ -49,9 +49,7 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 	        // Starts the query
 	        conn.connect();
 	        
-	        Log.d(TAG,"["+ this.getClass().toString() +"] Entrou em ddownloadJson");
 	        int response = conn.getResponseCode();
-	        Log.d(TAG,"["+ this.getClass().toString() +"]"+response);
 	        
 	        if ( response == 200 )
 	        {
@@ -67,7 +65,7 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 		catch ( IOException e)
 		{
 			e.printStackTrace();
-			return "Deu Pau aqui";
+			return "";
 		}			
 		finally {
 			if (is != null)
@@ -126,8 +124,6 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
             
             ong.save();            
             ong = new Ong(context); //clear            
-            
-            //Log.d(TAG, jsonOng.get("razao_social").toString() );
 		}
 	}
 	
@@ -136,8 +132,6 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 		// TODO Auto-generated method stub		
 		try
 		{
-			Log.d(TAG,"["+ this.getClass().toString() +"] Entrou em doInBackground");
-			
 			MyJson = this.downloadJson();
 			if ( ! MyJson.equals("") )
 			{

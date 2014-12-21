@@ -32,7 +32,7 @@ import com.br.soucausa.model.Cupom;
 import com.br.soucausa.model.Ong;
 import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
-import com.br.soucausa.util.Validation;
+import com.br.soucausa.util.AppUtils;
 
 /**
  * A simple {@link android.support.v4.app.Fragment} subclass. Activities that
@@ -213,7 +213,7 @@ public class TypeCupomFragment extends Fragment{
 					return;
 				}
 				
-				if ( Validation.isCnpjValido(cp.getCNPJ()) ) {
+				if ( AppUtils.isCnpjValido(cp.getCNPJ()) ) {
 					MainScreen activity = (MainScreen) getActivity();
 					cp.setCausaId( activity.getCausaId() );
 					new postCupomInfo(getActivity()).execute(cp);

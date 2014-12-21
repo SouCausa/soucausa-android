@@ -45,17 +45,6 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 	Button bt;
 	private OnPictureFragmentInteractionListener mListener;
 
-	/**
-	 * Use this factory method to create a new instance of this fragment using
-	 * the provided parameters.
-	 * 
-	 * @param param1
-	 *            Parameter 1.
-	 * @param param2
-	 *            Parameter 2.
-	 * @return A new instance of fragment TakePictureFragment.
-	 */
-	// TODO: Rename and change types and number of parameters
 	public static TakePictureFragment newInstance(String param1, String param2) {
 		TakePictureFragment fragment = new TakePictureFragment();
 		Bundle args = new Bundle();
@@ -116,15 +105,6 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 		mListener = null;
 	}
 
-	/**
-	 * This interface must be implemented by activities that contain this
-	 * fragment to allow an interaction in this fragment to be communicated to
-	 * the activity and potentially other fragments contained in that activity.
-	 * <p>
-	 * See the Android Training lesson <a href=
-	 * "http://developer.android.com/training/basics/fragments/communicating.html"
-	 * >Communicating with Other Fragments</a> for more information.
-	 */
 	public interface OnPictureFragmentInteractionListener {
 		// TODO: Update argument type and name
 		public void onPictureFragmentInteraction(Uri uri);
@@ -159,10 +139,7 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
 				.format(new Date());
 		String imageFileName = "JPEG_" + timeStamp + "_";
-		Log.d(Settings.TAG, "photo created 1");
-		File storageDir = Environment
-				.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		Log.d(Settings.TAG, "photo created 2");
+		File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 		File image = File.createTempFile(imageFileName, /* prefix */
 				".jpg", /* suffix */
 				storageDir /* directory */
@@ -170,34 +147,26 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 
 		// Save a file: path for use with ACTION_VIEW intents
 		mCurrentPhotoPath = "file:" + image.getAbsolutePath();
-		Log.d(Settings.TAG, "photo created");
 		return image;
 	}
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == Settings.REQUEST_TAKE_PHOTO
-				&& resultCode == Activity.RESULT_OK) {
+		if (requestCode == Settings.REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK)
+		{
 			if (data == null)
 				Log.d(Settings.TAG, "data == null");
-			/*
-			 * Bundle extras = data.getExtras(); Bitmap imageBitmap = (Bitmap)
-			 * extras.get("data"); ImageView mImageView = (ImageView)
-			 * findViewById(R.id.taken_photo);
-			 * mImageView.setImageBitmap(imageBitmap);
-			 */
+
 			this.galleryAddPic();
 		}
 
-		if (requestCode == Settings.REQUEST_CHOOSEN_ONG
-				&& resultCode == Activity.RESULT_OK) {
+		if (requestCode == Settings.REQUEST_CHOOSEN_ONG && resultCode == Activity.RESULT_OK)
+		{
 			ONG_ID = data.getLongExtra("ongId", (long) -1);
 			ONG_RAZAO_SOCIAL = data.getStringExtra("razao_social");
 
 			if (ONG_ID != -1) {
-
 				tv.setText(ONG_RAZAO_SOCIAL);
-
 			}
 		}
 	}
@@ -219,15 +188,11 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
         cp.setCausaId(activity.getCausaId());
         
         getActivity().sendBroadcast(mediaScanIntent);
-        
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(getActivity().CONNECTIVITY_SERVICE);
-        new PostPhoto(getActivity(),this,connectivityManager).execute(cp);
+        new PostPhoto(getActivity(),this).execute(cp);
 	}
 
 	@Override
 	public void onTaskComplete() {	
 		Log.d(Settings.TAG,"["+ this.getClass().toString() +"] onTaskComplete");
-//		Intent i = new Intent(getActivity().getApplicationContext(),ThankYouActivity.class);
-//		startActivity(i);
 	}
 }

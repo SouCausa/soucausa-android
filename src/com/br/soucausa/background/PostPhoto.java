@@ -23,7 +23,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -32,6 +31,7 @@ import android.widget.Toast;
 import com.br.soucausa.callbacks.CallbackPostPhoto;
 import com.br.soucausa.data.DataContract;
 import com.br.soucausa.model.Cupom;
+import com.br.soucausa.util.AppUtils;
 import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
 import com.br.soucausa.util.UserPreference;
@@ -44,13 +44,11 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	Context context;
 	public SQLiteDatabase db;
 	private CallbackPostPhoto callback;
-	ConnectivityManager connectivityManager;
 
 
-	public PostPhoto(Context context,CallbackPostPhoto callback,ConnectivityManager connectivityManager) {
+	public PostPhoto(Context context,CallbackPostPhoto callback) {
 		this.context = context;
 		this.callback = callback;
-		this.connectivityManager = connectivityManager;
 	}
 
 
@@ -63,9 +61,8 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 		Cupom cp = (Cupom) params[0];
 		UserPreference userPref = new UserPreference(this.context);
 		
-		if ( isNetworkAvailable() )
+		if ( AppUtils.isNetworkAvailable(this.context) )
 		{
-			Log.d(Settings.TAG,"HAS NETWORK AVAILABLE");
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
 			
@@ -107,21 +104,17 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 					jsonObject.put( "user_id" , userPref.getUserId() );
 				}
 				
-				
+				ByteArrayEntity btArray = new ByteArrayEntity( jsonObject.toString().getBytes("UTF8") );
+				btArray.setContentType("application/json");
+				httppost.setEntity( btArray );
 				
 			} catch (JSONException e) {
 				Log.d(Settings.TAG,"Deu bosta ao adicionar no JSON");
 				e.printStackTrace();
 			}
-			try {
-				ByteArrayEntity btArray = new ByteArrayEntity( jsonObject.toString().getBytes("UTF8") );
-				btArray.setContentType("application/json");
-				httppost.setEntity( btArray );
-			} catch (UnsupportedEncodingException e) {
-				Log.d(Settings.TAG,"Deu bosta ao transformar no JSON");
+			catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
-	
 	
 			try {
 				HttpResponse response = httpclient.execute(httppost);
@@ -167,7 +160,6 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 		}
 		else
 		{
-			Log.d(Settings.TAG,"postResponse != 200");
 			cv.put("path",cp.getFile().getPath());
 			cv.put("causa_id",userPref.getCausaId());
 			cv.put("status",0);
@@ -177,19 +169,12 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 		this.db.insert("DOACAO",null, cv);
 		return null;
 	}
-	
-	
-	public boolean isNetworkAvailable()
-	{
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();	    
-	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-	}
 
 
 	@Override
 
 	protected void onPreExecute() {
-		if ( isNetworkAvailable() )
+		if ( AppUtils.isNetworkAvailable(this.context) )
 			Toast.makeText(context, "Obrigado por doar.", Toast.LENGTH_SHORT).show();
 		else
 			Toast.makeText(context, "Obrigado por doar. Enviaremos quando houver conex‹o com a internet", Toast.LENGTH_LONG).show();

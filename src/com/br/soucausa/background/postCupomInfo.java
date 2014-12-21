@@ -46,8 +46,6 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 	public postCupomInfo(Context context) {
 		this.context = context;
 	}
-	
-
 
 	@Override
 	protected Void doInBackground(Object... cupom) {
@@ -80,15 +78,12 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 			
 			if (cp.getCausaId() != null)
 			{
-				Log.d(Settings.TAG,"AAAAAAA "+cp.getCausaId());
 				jsonObject.put("causa_fk" , cp.getCausaId());
 			}
 			else
 			{
-				Log.d(Settings.TAG,"BBBBBBB");
 				if ( userPref.getCausaId() != null )
 				{
-					Log.d(Settings.TAG,"CCCCCC");
 					jsonObject.put("causa_fk" , userPref.getCausaId());
 				}
 			}
@@ -108,7 +103,6 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 	    try {
 			HttpResponse response = httpclient.execute(httppost);
 			String responseStatus = response.getStatusLine().toString();
-			Log.d(Settings.TAG,"["+ this.getClass().toString() +"]"+responseStatus);
 			postResponse = response.getStatusLine().getStatusCode();
 
 			if (postResponse == 200)
@@ -117,14 +111,11 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 				pontuacao.incrementar(Settings.PONTOS_POR_FOTO);
 				pontuacao.syncPontuacao();
 			}
-			Log.d(Settings.TAG,responseStatus);
 		} catch (ClientProtocolException e) {
 			// TODO Auto-generated catch block
-			Log.d(Settings.TAG,"ClientProtocolException");
 			e.printStackTrace();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.d(Settings.TAG,"IOException");
 			e.printStackTrace();
 		}
 		return null;
@@ -144,7 +135,6 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 	protected void onPostExecute(Void param){
 		super.onPostExecute(param);
 		pDialog.dismiss();
-		
 		Toast.makeText(context, "Obrigado por doar!", Toast.LENGTH_LONG).show();
 	}
 

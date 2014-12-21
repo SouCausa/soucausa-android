@@ -1,15 +1,21 @@
 package com.br.soucausa.util;
 
+import android.app.Activity;
+import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.util.Log;
 
-public class Validation {
+public class AppUtils {
 
+	public static boolean isNetworkAvailable(Context context)
+	{
+	    ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();	    
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
 	public static boolean isCnpjValido(String cnpj)
 	{  
-		Log.d(Settings.TAG,cnpj);
-		
 		if("".equals(cnpj)){
 			return false;
 		}

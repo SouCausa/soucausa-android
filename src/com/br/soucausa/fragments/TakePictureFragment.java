@@ -11,6 +11,7 @@ import com.br.soucausa.background.PostPhoto;
 import com.br.soucausa.callbacks.CallbackPostPhoto;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.model.Ong;
+import com.br.soucausa.util.Constants;
 import com.br.soucausa.util.Settings;
 
 import android.app.Activity;
@@ -112,24 +113,17 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 
 	private void dispatchTakePictureIntent() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		// Ensure that there's a camera activity to handle the intent
-		if (takePictureIntent
-				.resolveActivity(getActivity().getPackageManager()) != null) {
-			// Create the File where the photo should go
+		if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
 			File photoFile = null;
 			try {
-				Log.d(Settings.TAG, "dispatch take picture..");
 				photoFile = createImageFile();
 			} catch (IOException ex) {
 				// Error occurred while creating the File
-
 			}
 			// Continue only if the File was successfully created
 			if (photoFile != null) {
-				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
-						Uri.fromFile(photoFile));
-				startActivityForResult(takePictureIntent,
-						Settings.REQUEST_TAKE_PHOTO);
+				takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,Uri.fromFile(photoFile));
+				startActivityForResult(takePictureIntent,Constants.REQUEST_TAKE_PHOTO);
 			}
 		}
 	}
@@ -152,15 +146,10 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if (requestCode == Settings.REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK)
-		{
-			if (data == null)
-				Log.d(Settings.TAG, "data == null");
-
+		if (requestCode == Constants.REQUEST_TAKE_PHOTO && resultCode == Activity.RESULT_OK)
 			this.galleryAddPic();
-		}
 
-		if (requestCode == Settings.REQUEST_CHOOSEN_ONG && resultCode == Activity.RESULT_OK)
+		if (requestCode == Constants.REQUEST_CHOOSEN_ONG && resultCode == Activity.RESULT_OK)
 		{
 			ONG_ID = data.getLongExtra("ongId", (long) -1);
 			ONG_RAZAO_SOCIAL = data.getStringExtra("razao_social");
@@ -193,6 +182,6 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 
 	@Override
 	public void onTaskComplete() {	
-		Log.d(Settings.TAG,"["+ this.getClass().toString() +"] onTaskComplete");
+		
 	}
 }

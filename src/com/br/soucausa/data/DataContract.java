@@ -69,9 +69,6 @@ public class DataContract extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		// TODO Auto-generated method stub
-		Log.d(Settings.TAG,"onCreate");
-		Log.d(Settings.TAG,"onCreate Method on SQLiteOpenHelper");
 		db.execSQL(SQL_CREATE_DOACOES);
 	}
 	
@@ -83,7 +80,6 @@ public class DataContract extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// TODO Auto-generated method stub
-		Log.d(Settings.TAG,"onUpgrade");
 		db.execSQL(SQL_DELETE_DOACAO);
 		this.onCreate(db);
 	}

@@ -69,7 +69,6 @@ public class Pontuacao {
         putRequest.addHeader("Accept", "application/json");
         
         JSONObject keyArg = new JSONObject();
-        // Aqui eu posso verificar se a pontuacao é Syncable ???? Utilizando um método interno da classe UserPreferences
         try {
 			keyArg.put("pontuacao", userPref.getPontuacao());
 			keyArg.put("deviceId", userPref.getDeviceId());

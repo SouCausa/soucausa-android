@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -22,7 +23,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.ConnectivityManager;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -32,25 +32,42 @@ import com.br.soucausa.callbacks.CallbackPostPhoto;
 import com.br.soucausa.data.DataContract;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.util.AppUtils;
+import com.br.soucausa.util.Constants;
 import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
 import com.br.soucausa.util.UserPreference;
 
 public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	
-	
-	ProgressDialog pDialog;
-	int postResponse;
-	Context context;
-	public SQLiteDatabase db;
 	private CallbackPostPhoto callback;
-
+	private ProgressDialog pDialog;
+	private int postResponse;
+	private Context context;
+	private SQLiteDatabase db;
+	private BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+	
+	private int photoW;
+    private int photoH;
+    private int targetW = 550;
+    private int targetH = 620;
+    private int scaleFactor;
 
 	public PostPhoto(Context context,CallbackPostPhoto callback) {
 		this.context = context;
 		this.callback = callback;
 	}
-
+	
+	private void setUpBitmapDimensions() {
+		bmOptions.inJustDecodeBounds = true;
+		photoW = bmOptions.outWidth;
+	    photoH = bmOptions.outHeight;
+	    targetW = 550;
+	    targetH = 620;
+	    scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+	    bmOptions.inJustDecodeBounds = false;
+	    bmOptions.inSampleSize = scaleFactor;
+	    bmOptions.inPurgeable = true;
+	}
 
 	@Override
 	protected Void doInBackground(Object... params) {
@@ -65,18 +82,9 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 		{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
-			
-			BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-		    bmOptions.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(cp.getFile().getPath(),bmOptions);
-			int photoW = bmOptions.outWidth;
-		    int photoH = bmOptions.outHeight;
-		    int targetW = 550;
-		    int targetH = 620;
-		    int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-		    bmOptions.inJustDecodeBounds = false;
-		    bmOptions.inSampleSize = scaleFactor;
-		    bmOptions.inPurgeable = true;
+			
+			this.setUpBitmapDimensions();
 			
 			Bitmap bitmap = BitmapFactory.decodeFile(cp.getFile().getPath(), bmOptions);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -92,7 +100,9 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 				jsonObject.put("device_id" , userPref.getDeviceId());
 				
 				if (cp.getCausaId() != null)
+				{
 					jsonObject.put("causa_fk" , cp.getCausaId());
+				}
 				else
 				{
 					if ( userPref.getCausaId() != null )
@@ -108,21 +118,10 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 				btArray.setContentType("application/json");
 				httppost.setEntity( btArray );
 				
-			} catch (JSONException e) {
-				Log.d(Settings.TAG,"Deu bosta ao adicionar no JSON");
-				e.printStackTrace();
-			}
-			catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			}
-	
-			try {
 				HttpResponse response = httpclient.execute(httppost);
-				String responseStatus = response.getStatusLine().toString();
-				Log.d(Settings.TAG,"["+ this.getClass().toString() +"]"+responseStatus);
 				postResponse = response.getStatusLine().getStatusCode();
 				
-				if (postResponse == 200)
+				if (postResponse == HttpStatus.SC_OK)
 				{
 					if ( !userPref.hasUserId() )
 					{
@@ -134,27 +133,27 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 					}
 					
 					Pontuacao pontuacao = new Pontuacao(context);
-					pontuacao.incrementar(Settings.PONTOS_POR_FOTO);
+					pontuacao.incrementar(Constants.PONTOS_POR_FOTO);
 					pontuacao.syncPontuacao();
-					//create the row as status 1 (SENT)
-					Log.d(Settings.TAG,"postResponse == 200");
 					cv.put("path",cp.getFile().getPath());
 					cv.put("causa_id",userPref.getCausaId());
 					cv.put("status",1);
 				}
 				else
 				{
-					Log.d(Settings.TAG,"postResponse != 200");
+					Log.d(Constants.TAG,"postResponse != 200");
 					cv.put("path",cp.getFile().getPath());
 					cv.put("causa_id",userPref.getCausaId());
 					cv.put("status",0);
 				}
-	
+				
+			} catch (JSONException e) {
+				e.printStackTrace();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 		}
@@ -163,7 +162,6 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 			cv.put("path",cp.getFile().getPath());
 			cv.put("causa_id",userPref.getCausaId());
 			cv.put("status",0);
-			Log.d(Settings.TAG,"HASN'T NETWORK AVAILABLE");
 		}
 		
 		this.db.insert("DOACAO",null, cv);
@@ -175,13 +173,16 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 
 	protected void onPreExecute() {
 		if ( AppUtils.isNetworkAvailable(this.context) )
+		{
 			Toast.makeText(context, "Obrigado por doar.", Toast.LENGTH_SHORT).show();
+		}
 		else
+		{
 			Toast.makeText(context, "Obrigado por doar. Enviaremos quando houver conex‹o com a internet", Toast.LENGTH_LONG).show();
+		}
 		
 		this.callback.onTaskComplete();
 	}
-
 
 	@Override
 	protected void onPostExecute(Void param){

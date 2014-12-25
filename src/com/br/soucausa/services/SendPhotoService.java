@@ -4,12 +4,12 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.br.soucausa.data.DataContract;
+import com.br.soucausa.util.Constants;
 import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
 import com.br.soucausa.util.UserPreference;
@@ -34,7 +35,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.util.Base64;
-import android.util.Log;
 
 public class SendPhotoService extends Service {
 
@@ -43,16 +43,9 @@ public class SendPhotoService extends Service {
     ExecutorService mExecutor;
 	
 	public static Intent makeIntent(Context context) {
-
 		Intent intent = new Intent(context, SendPhotoService.class);
-
-		// Create and pass a Messenger as an "extra" so the
-		// DownloadService can send back the pathname.
-		//intent.putExtra("MESSENGER", new Messenger(downloadHandler));
-		
 		return intent;
 	}
-	
 	
 	@Override
 	public void onCreate() {
@@ -88,7 +81,6 @@ public class SendPhotoService extends Service {
 					@Override
 					public void run() {
 						// TODO Auto-generated method stub
-						Log.d(Settings.TAG,path);
 						UserPreference userPref = new UserPreference(context);
 						HttpClient httpclient = new DefaultHttpClient();
 						HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
@@ -134,14 +126,11 @@ public class SendPhotoService extends Service {
 							httppost.setEntity( btArray );
 							
 							HttpResponse response = httpclient.execute(httppost);
-							String responseStatus = response.getStatusLine().toString();
-							Log.d(Settings.TAG,"["+ this.getClass().toString() +"]"+responseStatus);
 							int postResponse = response.getStatusLine().getStatusCode();
 							
-							if (postResponse == 200)
+							if (postResponse == HttpStatus.SC_OK)
 							{
 								countThreads.countDown();
-								Log.d(Settings.TAG,"postResponse == 200");
 								
 								if ( !userPref.hasUserId() )
 								{
@@ -153,7 +142,7 @@ public class SendPhotoService extends Service {
 								}
 	
 								Pontuacao pontuacao = new Pontuacao(context);
-								pontuacao.incrementar(Settings.PONTOS_POR_FOTO);
+								pontuacao.incrementar(Constants.PONTOS_POR_FOTO);
 								
 								DataContract dbHelper = new DataContract(context);
 								SQLiteDatabase db = dbHelper.getWritableDatabase();
@@ -166,11 +155,9 @@ public class SendPhotoService extends Service {
 							else
 							{
 								countThreads.countDown();
-								Log.d(Settings.TAG,"postResponse != 200");
 							}
 	
 						} catch (JSONException e) {
-							Log.d(Settings.TAG,"Deu bosta ao adicionar no JSON");
 							e.printStackTrace();
 						} catch (ClientProtocolException e) {
 							// TODO Auto-generated catch block
@@ -179,7 +166,6 @@ public class SendPhotoService extends Service {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
 					}
 					
 				};
@@ -190,7 +176,6 @@ public class SendPhotoService extends Service {
 			try {
 				countThreads.await();
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				stopSelf();

@@ -18,7 +18,6 @@ public class UpdateReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		Log.d(Settings.TAG,intent.getAction());
 		
 	    if ( intent.getAction() != null &&  intent.getAction() ==  "android.net.conn.CONNECTIVITY_CHANGE")
 	    {
@@ -35,13 +34,11 @@ public class UpdateReceiver extends BroadcastReceiver {
 					context.startService(i);
 					
 	                firstConnect = false;
-	                Log.i(Settings.TAG, "ESTA CONNECTADO");
 	            }
 			}
 			else
 			{
 				firstConnect= true;
-				Log.i(Settings.TAG, "NÌO ESTA CONNECTADO");
 			}
 	    }
 

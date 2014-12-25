@@ -14,7 +14,6 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,8 +29,8 @@ import com.br.soucausa.background.postCupomInfo;
 import com.br.soucausa.dialogs.DatePickerFragment;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.model.Ong;
+import com.br.soucausa.util.Constants;
 import com.br.soucausa.util.Pontuacao;
-import com.br.soucausa.util.Settings;
 import com.br.soucausa.util.AppUtils;
 
 /**
@@ -201,11 +200,6 @@ public class TypeCupomFragment extends Fragment{
 				Ong ong = new Ong(v.getContext());
 				ong.setONGId(ONG_ID);				
 				cp.setOng(ong);				
-
-				Log.d(Settings.TAG,cp.getCNPJ());
-				Log.d(Settings.TAG,cp.getData());
-				Log.d(Settings.TAG,cp.getCOO());
-				Log.d(Settings.TAG, Float.toString(cp.getTotal()));
 				
 				
 				if("".equals(cp.getCNPJ()) || "".equals(cp.getCOO()) || "".equals(cp.getTotal())){
@@ -218,8 +212,8 @@ public class TypeCupomFragment extends Fragment{
 					cp.setCausaId( activity.getCausaId() );
 					new postCupomInfo(getActivity()).execute(cp);
 				}
-				else{
-					Log.d(Settings.TAG,"nao validado!");
+				else
+				{
 					Toast.makeText(getActivity(), "CNPJ invalido!", Toast.LENGTH_SHORT).show();
 				}
 			}
@@ -303,10 +297,9 @@ public class TypeCupomFragment extends Fragment{
 
 	public void takeThePicture() {
 		Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-
-		if (takePictureIntent
-				.resolveActivity(getActivity().getPackageManager()) != null) {
-			startActivityForResult(takePictureIntent, Settings.REQUEST_IMAGE_CAPTURE);
+		if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null)
+		{
+			startActivityForResult(takePictureIntent, Constants.REQUEST_IMAGE_CAPTURE);
 		}
 	}
 

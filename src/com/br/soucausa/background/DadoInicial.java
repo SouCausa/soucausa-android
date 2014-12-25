@@ -9,25 +9,20 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.Iterator;
-
-import org.json.JSONArray;
+import org.apache.http.HttpStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.br.soucausa.callbacks.CallbackDadoInicial;
 import com.br.soucausa.model.Ong;
 import com.br.soucausa.util.Settings;
-
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 
 	private Context context;
 	private CallbackDadoInicial callback;
 	private String MyJson;
-	static final String TAG = "SalveCupom";
 	
 	public DadoInicial(Context context,CallbackDadoInicial callback)
 	{
@@ -51,7 +46,7 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 	        
 	        int response = conn.getResponseCode();
 	        
-	        if ( response == 200 )
+	        if ( response == HttpStatus.SC_OK )
 	        {
 		        is = conn.getInputStream();	        
 		        String contentAsString = readIt(is);
@@ -129,7 +124,6 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 	
 	@Override
 	protected Boolean doInBackground(Void... params) {
-		// TODO Auto-generated method stub		
 		try
 		{
 			MyJson = this.downloadJson();
@@ -137,21 +131,13 @@ public class DadoInicial extends AsyncTask<Void, Void, Boolean> {
 			{
 				parseMyJson();
 			}
-			else
-			{
-				Log.d(TAG,"["+ this.getClass().toString() +"] MyJson = ''");
-			}
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"["+ this.getClass().toString() +"] IOException deu errado exception");
 			e.printStackTrace();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
-			Log.d(TAG,"["+ this.getClass().toString() +"] JSONException deu errado exception");
 			e.printStackTrace();
 		}
-		
 		
 		return null;
 	}

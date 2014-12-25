@@ -41,7 +41,6 @@ public class TabListenerListFragment <T extends ListFragment> implements ActionB
 			android.app.FragmentTransaction ft) {
 		android.support.v4.app.FragmentTransaction ftt = mActivity.getSupportFragmentManager().beginTransaction();
 		
-		Log.d(Settings.TAG,"onTabUnselected");
 		if(fragment != null){
 			ftt.detach(fragment).commit();
 		}

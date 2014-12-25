@@ -33,7 +33,6 @@ public class TabListener <T extends Fragment> implements ActionBar.TabListener {
 
 	@Override
 	public void onTabSelected(Tab arg0, android.app.FragmentTransaction ft) {
-		Log.d(Settings.TAG,"onTabSelected");
 		fragment = mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
 		fft = mActivity.getSupportFragmentManager().beginTransaction();
 		if(fragment == null) {
@@ -50,8 +49,6 @@ public class TabListener <T extends Fragment> implements ActionBar.TabListener {
 
 	@Override
 	public void onTabUnselected(Tab arg0, android.app.FragmentTransaction ft) {
-		Log.d(Settings.TAG,"onTabUnselected");
-		
 		fragment = mActivity.getSupportFragmentManager().findFragmentByTag(mTag);
 
         if (fragment != null && !fragment.isDetached())

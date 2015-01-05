@@ -60,23 +60,22 @@ public class PostDeviceInfo extends AsyncTask<Bundle, Void, Void> {
 					String json = reader.readLine();
 					JSONTokener tokener = new JSONTokener(json);
 					JSONObject finalResult = new JSONObject(tokener);
-					
-					UserPreference userPref = new UserPreference(context);
-					if ( finalResult.getBoolean("implicit") )
+					if ( finalResult != null )
 					{
-						Log.d(Constants.TAG,"["+ this.getClass().toString() +"] SET AS USER IMPLICIT");
-						userPref.setUserAsImplicit();
-					}
-					else
-					{
-						Log.d(Constants.TAG,"["+ this.getClass().toString() +"] SET AS USER EXPLICIT");
-						userPref.setUserAsExplicit();
-					}
+						UserPreference userPref = new UserPreference(context);
+						if ( finalResult.getBoolean("implicit") )
+						{
+							Log.d(Constants.TAG,"["+ this.getClass().toString() +"] SET AS USER IMPLICIT");
+							userPref.setUserAsImplicit();
+						}
+						else
+						{
+							Log.d(Constants.TAG,"["+ this.getClass().toString() +"] SET AS USER EXPLICIT");
+							userPref.setUserAsExplicit();
+						}
 						
-					
-					userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
-					Pontuacao pontuacao = new Pontuacao(context);
-					pontuacao.syncPontuacao();
+						userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
+					}
 				}
 			}
 			

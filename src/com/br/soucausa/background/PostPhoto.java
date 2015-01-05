@@ -2,8 +2,12 @@ package com.br.soucausa.background;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
@@ -25,6 +29,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
+import android.util.Base64OutputStream;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -58,22 +63,20 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	}
 	
 	private void setUpBitmapDimensions() {
-		bmOptions.inJustDecodeBounds = true;
 		photoW = bmOptions.outWidth;
 	    photoH = bmOptions.outHeight;
 	    targetW = 550;
 	    targetH = 620;
 	    scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-	    bmOptions.inJustDecodeBounds = false;
 	    bmOptions.inSampleSize = scaleFactor;
-	    bmOptions.inPurgeable = true;
 	}
 
 	@Override
 	protected Void doInBackground(Object... params) {
 	
 		DataContract dbHelper = new DataContract(context);
-		this.db = dbHelper.getWritableDatabase(); //just called once.
+		this.db = dbHelper.getWritableDatabase();
+		
 		ContentValues cv = new ContentValues();
 		Cupom cp = (Cupom) params[0];
 		UserPreference userPref = new UserPreference(this.context);
@@ -82,15 +85,25 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 		{
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
-			BitmapFactory.decodeFile(cp.getFile().getPath(),bmOptions);
 			
+			
+			bmOptions.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(cp.getFile().getPath(), bmOptions);
 			this.setUpBitmapDimensions();
 			
+			bmOptions.inJustDecodeBounds = false;
 			Bitmap bitmap = BitmapFactory.decodeFile(cp.getFile().getPath(), bmOptions);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
 			
 			byte[] b = baos.toByteArray(); // b is my ByteArray
+			
+			try {
+				baos.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
 			String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
 			JSONObject jsonObject = new JSONObject();
 	
@@ -129,12 +142,11 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 						String json = reader.readLine();
 						JSONTokener tokener = new JSONTokener(json);
 						JSONObject finalResult = new JSONObject(tokener);
-						userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
+						if ( finalResult != null ) {
+							userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
+						}
 					}
 					
-					Pontuacao pontuacao = new Pontuacao(context);
-					pontuacao.incrementar(Constants.PONTOS_POR_FOTO);
-					pontuacao.syncPontuacao();
 					cv.put("path",cp.getFile().getPath());
 					cv.put("causa_id",userPref.getCausaId());
 					cv.put("status",1);

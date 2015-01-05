@@ -2,12 +2,8 @@ package com.br.soucausa.background;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.http.HttpResponse;
@@ -29,7 +25,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
-import android.util.Base64OutputStream;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -38,7 +33,6 @@ import com.br.soucausa.data.DataContract;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.util.AppUtils;
 import com.br.soucausa.util.Constants;
-import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
 import com.br.soucausa.util.UserPreference;
 
@@ -94,7 +88,7 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 			bmOptions.inJustDecodeBounds = false;
 			Bitmap bitmap = BitmapFactory.decodeFile(cp.getFile().getPath(), bmOptions);
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 80, baos);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, Constants.COMPRESS_RATE, baos);
 			
 			byte[] b = baos.toByteArray(); // b is my ByteArray
 			

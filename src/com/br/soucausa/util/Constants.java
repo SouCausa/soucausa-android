@@ -6,6 +6,7 @@ public class Constants {
 	public static final int REQUEST_CHOOSEN_ONG = 2;
 	public static final int REQUEST_TAKE_PHOTO = 1;
 	public static final int PONTOS_POR_FOTO = 5;
+	public static final int COMPRESS_RATE = 80;
 	
 	public static final String PATH_TO_FILE = "PathToFile";
 	public static final String ONG = "OngId";

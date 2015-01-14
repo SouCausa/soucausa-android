@@ -6,6 +6,7 @@ import com.br.soucausa.callbacks.CallbackDadoInicial;
 import com.br.soucausa.factories.NotificationFactory;
 import com.br.soucausa.factories.ScNotification;
 import com.br.soucausa.factories.ScNotification.ScType;
+import com.br.soucausa.factories.ScStatusBarNotification;
 import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.util.AppUtils;
 import com.br.soucausa.util.DeviceInfo;
@@ -25,8 +26,8 @@ public class SplashScreen extends Activity implements CallbackDadoInicial {
 		setContentView(R.layout.activity_splash_screen);
 		
 		//CODE TEST BLOCK
-			ScToastNotification toastNot = (ScToastNotification) NotificationFactory.createNotification(ScNotification.ScType.TOAST);
-			toastNot.doNotify("testando", this.getApplicationContext());
+			ScStatusBarNotification statusNotification = (ScStatusBarNotification) NotificationFactory.createNotification(ScNotification.ScType.STATUS_BAR);
+			statusNotification.doNotify("Sou Causa","Ol‡ querido amigo, lembre-se de ajudar a sua causa doando sua nota fiscal paulista hoje",this.getApplicationContext());
 		//CODE TEST BLOCK
 		
 		userPref = new UserPreference(this);

@@ -13,6 +13,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.br.logsocial.R;
+import com.br.soucausa.factories.NotificationFactory;
+import com.br.soucausa.factories.ScNotification;
+import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.fragments.CausasGridFragment;
 import com.br.soucausa.fragments.TakePictureFragment;
 import com.br.soucausa.listeners.TabListener;
@@ -94,16 +97,16 @@ public class MainScreen extends FragmentActivity implements CausasGridFragment.O
 
 	@Override
 	public void onFragmentInteraction(String id) {
-		getActionBar().setSelectedNavigationItem(takePictureTab.getPosition()); 
-		String msg = "Causa: "+CausasGridFragment.causasImg.get(Integer.parseInt(id)).getDescription() + ", selecionada";
-		Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
 		causaId = id;
+		getActionBar().setSelectedNavigationItem(takePictureTab.getPosition()); 
+		ScToastNotification toastNot = (ScToastNotification) NotificationFactory.createNotification(ScNotification.ScType.TOAST);
+		String toastMessage = "Causa: "+CausasGridFragment.causasImg.get(Integer.parseInt(id)).getDescription() + ", selecionada";
+		toastNot.doNotify(toastMessage, this);
 		userPref.setCausaId(id);
 		displayCausaOnActionBar();
 	}
 	
 	public void displayCausaOnActionBar() {
-
 		ActionBar actionBar = getActionBar();
 		actionBar.setCustomView(R.layout.custom_actionbar);
 		actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM

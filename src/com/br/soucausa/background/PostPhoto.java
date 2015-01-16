@@ -59,9 +59,7 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	private void setUpBitmapDimensions() {
 		photoW = bmOptions.outWidth;
 	    photoH = bmOptions.outHeight;
-	    targetW = 550;
-	    targetH = 620;
-	    scaleFactor = Math.min(photoW/targetW, photoH/targetH);
+	    scaleFactor = Math.min(photoW/Constants.TARGET_WIDTH_PHOTO, photoH/Constants.TARGET_HEIGHT_PHOTO);
 	    bmOptions.inSampleSize = scaleFactor;
 	}
 

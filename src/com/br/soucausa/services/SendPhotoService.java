@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -35,12 +36,14 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.IBinder;
 import android.util.Base64;
+import android.util.Log;
 
 public class SendPhotoService extends Service {
 
-    static final int MAX_THREADS = 4;
+    static final int MAX_THREADS = 4; //my num of threads in the pool
     final Context context = this;
     ExecutorService mExecutor;
+    CountDownLatch countThreads;
 	
 	public static Intent makeIntent(Context context) {
 		Intent intent = new Intent(context, SendPhotoService.class);
@@ -49,132 +52,144 @@ public class SendPhotoService extends Service {
 	
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		mExecutor = Executors.newFixedThreadPool(MAX_THREADS);
 	}
 	
+	private class UploadPendingPhotos implements Runnable {
+		
+		private String path;
+		private Integer causaId;
+		private Integer _id;
+		CountDownLatch countThreads;
+		BitmapFactory.Options bmOptions;
+		
+		public UploadPendingPhotos(String path,Integer causaId,Integer _id,CountDownLatch countThreads) {
+			this.path = path;
+			this.causaId = causaId;
+			this._id  = _id;
+			this.countThreads = countThreads;
+			
+			bmOptions = new BitmapFactory.Options();
+		}
+		
+		private void setUpBitmapDimensions() {
+			int photoW = bmOptions.outWidth;
+		    int photoH = bmOptions.outHeight;
+		    int scaleFactor = Math.min(photoW/Constants.TARGET_WIDTH_PHOTO, photoH/Constants.TARGET_HEIGHT_PHOTO);
+		    bmOptions.inSampleSize = scaleFactor;
+		}
+		
+		private void setPhotoAsSent() {
+			DataContract dbHelper = new DataContract(context);
+			SQLiteDatabase db = dbHelper.getWritableDatabase();
+			
+			ContentValues values = new ContentValues();
+			values.put("status",1);
+			
+			String[] whereValues = new String[1];
+			whereValues[0] = new Integer(_id).toString();
+			
+			db.update("DOACAO", values, "_id = ?", whereValues);
+			
+			db.close();
+		}
+		
+		@Override
+		public void run() {
 
+			Log.d(Constants.TAG,"running");
+			
+			UserPreference userPref = new UserPreference(context);
+			HttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
+			
+		    bmOptions.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(path,bmOptions);
+			setUpBitmapDimensions();
+
+			bmOptions.inJustDecodeBounds = false;
+			Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
+			
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+			
+			byte[] b = baos.toByteArray();
+			String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
+			
+			try{
+				JSONObject jsonObject = new JSONObject();
+				jsonObject.accumulate("image_base64", encodedImage);
+				jsonObject.put("device_id" , userPref.getDeviceId());
+				
+				if (this.causaId != null)
+				{
+					jsonObject.put("causa_fk" , this.causaId);
+				}
+				else
+				{
+					if ( userPref.getCausaId() != null )
+						jsonObject.put("causa_fk" , userPref.getCausaId());
+				}
+				
+				if ( userPref.hasUserId() )
+					jsonObject.put( "user_id" , userPref.getUserId() );
+				
+				ByteArrayEntity btArray = new ByteArrayEntity( jsonObject.toString().getBytes("UTF8") );
+				btArray.setContentType("application/json");
+				httppost.setEntity( btArray );
+				
+				HttpResponse response = httpclient.execute(httppost);
+				int postResponse = response.getStatusLine().getStatusCode();
+				
+				if (postResponse == HttpStatus.SC_OK)
+				{
+					if ( !userPref.hasUserId() )
+					{
+						BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+						String json = reader.readLine();
+						JSONTokener tokener = new JSONTokener(json);
+						JSONObject finalResult = new JSONObject(tokener);
+						userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
+					}
+					
+					setPhotoAsSent();
+				}
+
+			} catch (Exception e) {
+				
+			} finally {
+				this.countThreads.countDown();
+			}
+		}
+	};
+		
+	
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		// TODO Auto-generated method stub
-		//return super.onStartCommand(intent, flags, startId);
-		Runnable downloadRunnable;
 		DataContract dbHelper = new DataContract(context);
 		SQLiteDatabase db = dbHelper.getWritableDatabase();
-		Cursor cursor = db.query(true, "DOACAO", null ,"status = 0",null,null,null,"_id",null);
+		
+		Cursor cursor = db.query(true, "DOACAO", null ,"status = " + Constants.STATUS_DONATE_NOT_SENT,null,null,null,"_id",null);
+		countThreads = new CountDownLatch( cursor.getCount() );
 		
 		if ( cursor.getCount() == 0 )
 		{
+			Log.d(Constants.TAG,"Stoping Service. Photos Count == 0");
 			stopSelf();
 		}
 		else
 		{
-			final CountDownLatch countThreads = new CountDownLatch( cursor.getCount() );
-
 			while (cursor.moveToNext()) {
-			    final String path = cursor.getString( cursor.getColumnIndex("path") );
-			    final Integer causa_id = cursor.getInt( cursor.getColumnIndex("causa_id") );
-			    final int _id = cursor.getInt( cursor.getColumnIndex("_id") );
+				Log.d(Constants.TAG,"looping..");
+			    String path = cursor.getString( cursor.getColumnIndex("path") );
+			    Integer causaId = cursor.getInt( cursor.getColumnIndex("causa_id") );
+			    Integer _id = cursor.getInt( cursor.getColumnIndex("_id") );
 			    
-			    downloadRunnable = new Runnable() {
-			    	
-					@Override
-					public void run() {
-						// TODO Auto-generated method stub
-						UserPreference userPref = new UserPreference(context);
-						HttpClient httpclient = new DefaultHttpClient();
-						HttpPost httppost = new HttpPost(Settings.postPhotoUrl);
-						
-						BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-					    bmOptions.inJustDecodeBounds = true;
-						BitmapFactory.decodeFile(path,bmOptions);
-						int photoW = bmOptions.outWidth;
-					    int photoH = bmOptions.outHeight;
-					    int targetW = 550;
-					    int targetH = 620;
-					    int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-					    bmOptions.inJustDecodeBounds = false;
-					    bmOptions.inSampleSize = scaleFactor;
-					    bmOptions.inPurgeable = true;
-						
-						Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
-						ByteArrayOutputStream baos = new ByteArrayOutputStream();
-						bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-						
-						byte[] b = baos.toByteArray(); // b is my ByteArray
-						String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);
-						JSONObject jsonObject = new JSONObject();
-						
-						try {
-							
-							jsonObject.accumulate("image_base64", encodedImage);
-							jsonObject.put("device_id" , userPref.getDeviceId());
-							
-							if (causa_id != null)
-								jsonObject.put("causa_fk" , causa_id);
-							else
-							{
-								if ( userPref.getCausaId() != null )
-									jsonObject.put("causa_fk" , userPref.getCausaId());
-							}
-							
-							if ( userPref.hasUserId() )
-								jsonObject.put( "user_id" , userPref.getUserId() );
-							
-							ByteArrayEntity btArray = new ByteArrayEntity( jsonObject.toString().getBytes("UTF8") );
-							btArray.setContentType("application/json");
-							httppost.setEntity( btArray );
-							
-							HttpResponse response = httpclient.execute(httppost);
-							int postResponse = response.getStatusLine().getStatusCode();
-							
-							if (postResponse == HttpStatus.SC_OK)
-							{
-								countThreads.countDown();
-								
-								if ( !userPref.hasUserId() )
-								{
-									BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
-									String json = reader.readLine();
-									JSONTokener tokener = new JSONTokener(json);
-									JSONObject finalResult = new JSONObject(tokener);
-									userPref.setUserId( Integer.parseInt( finalResult.get("userId").toString() )  );
-								}
-	
-								Pontuacao pontuacao = new Pontuacao(context);
-								pontuacao.incrementar(Constants.PONTOS_POR_FOTO);
-								
-								DataContract dbHelper = new DataContract(context);
-								SQLiteDatabase db = dbHelper.getWritableDatabase();
-								ContentValues values = new ContentValues();
-								values.put("status",1);
-								String[] whereValues = new String[1];
-								whereValues[0] = new Integer(_id).toString();
-								db.update("DOACAO", values, "_id = ?", whereValues);
-							}
-							else
-							{
-								countThreads.countDown();
-							}
-	
-						} catch (JSONException e) {
-							e.printStackTrace();
-						} catch (ClientProtocolException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
-					
-				};
-			
-				mExecutor.execute(downloadRunnable);
+			    mExecutor.execute(new UploadPendingPhotos(path, causaId, _id,countThreads));
 			}
 			
 			try {
-				countThreads.await();
+				countThreads.await(Constants.UPLOAD_PHOTO_TIMEOUT_INSECONDS,TimeUnit.SECONDS);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} finally {
@@ -188,7 +203,6 @@ public class SendPhotoService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 

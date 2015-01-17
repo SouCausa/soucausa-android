@@ -12,6 +12,10 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.br.soucausa.factories.NotificationFactory;
+import com.br.soucausa.factories.ScNotification;
+import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.model.Ong;
 import com.br.soucausa.util.Constants;
@@ -108,7 +112,8 @@ public class postCupomInfo extends AsyncTask<Object, Void, Void> {
 	protected void onPostExecute(Void param){
 		super.onPostExecute(param);
 		pDialog.dismiss();
-		Toast.makeText(context, "Obrigado por doar!", Toast.LENGTH_LONG).show();
+		ScToastNotification toastNot = (ScToastNotification) NotificationFactory.createNotification(ScNotification.ScType.TOAST);
+		toastNot.doNotify("Obrigado por doar!", this.context);
 	}
 
 }

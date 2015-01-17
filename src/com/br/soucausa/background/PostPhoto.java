@@ -30,6 +30,9 @@ import android.widget.Toast;
 
 import com.br.soucausa.callbacks.CallbackPostPhoto;
 import com.br.soucausa.data.DataContract;
+import com.br.soucausa.factories.NotificationFactory;
+import com.br.soucausa.factories.ScNotification;
+import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.util.AppUtils;
 import com.br.soucausa.util.Constants;
@@ -176,14 +179,12 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	@Override
 
 	protected void onPreExecute() {
+		ScToastNotification toastNot = (ScToastNotification) NotificationFactory.createNotification(ScNotification.ScType.TOAST);
+		
 		if ( AppUtils.isNetworkAvailable(this.context) )
-		{
-			Toast.makeText(context, "Obrigado por doar.", Toast.LENGTH_SHORT).show();
-		}
+			toastNot.doNotify("Obrigado por doar!", this.context);
 		else
-		{
-			Toast.makeText(context, "Obrigado por doar. Enviaremos quando houver conex‹o com a internet", Toast.LENGTH_LONG).show();
-		}
+			toastNot.doNotify("Obrigado por doar! Enviaremos quando houver conex‹o com a internet", this.context);
 		
 		this.callback.onTaskComplete();
 	}

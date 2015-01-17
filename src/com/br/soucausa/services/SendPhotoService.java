@@ -40,7 +40,13 @@ import android.util.Log;
 
 public class SendPhotoService extends Service {
 
-    static final int MAX_THREADS = 4; //my num of threads in the pool
+    /*
+     * TODO later
+     * We should set the number of worker threads based on the available heap memory.
+     * We know that older devices can't handle a lot of bitmaps same time.
+     */
+	static final int MAX_THREADS = 2;
+    
     final Context context = this;
     ExecutorService mExecutor;
     CountDownLatch countThreads;
@@ -110,8 +116,13 @@ public class SendPhotoService extends Service {
 			bmOptions.inJustDecodeBounds = false;
 			Bitmap bitmap = BitmapFactory.decodeFile(path, bmOptions);
 			
+		    /*
+		     * TODO later
+		     * We should choose compress scale based on memory heap availability.
+		     * We know that older devices can't handle a lot of bitmaps same time. So, make sense we compress a bit more to avoid memory issues
+		     */
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			bitmap.compress(Bitmap.CompressFormat.JPEG, 70, baos);
+			bitmap.compress(Bitmap.CompressFormat.JPEG, Constants.COMPRESS_RATE, baos);
 			
 			byte[] b = baos.toByteArray();
 			String encodedImage = Base64.encodeToString(b, Base64.DEFAULT);

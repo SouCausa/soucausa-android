@@ -130,14 +130,10 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 
 	private File createImageFile() throws IOException {
 		// Create an image file name
-		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss")
-				.format(new Date());
+		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = "JPEG_" + timeStamp + "_";
 		File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-		File image = File.createTempFile(imageFileName, /* prefix */
-				".jpg", /* suffix */
-				storageDir /* directory */
-		);
+		File image = File.createTempFile(imageFileName, /* prefix */".jpg", /* suffix */storageDir /* directory */);
 
 		// Save a file: path for use with ACTION_VIEW intents
 		mCurrentPhotoPath = "file:" + image.getAbsolutePath();
@@ -163,21 +159,29 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 	private void galleryAddPic() {
 
 	    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
-		Uri uri = Uri.parse(mCurrentPhotoPath);
 	    
-        Ong ong = new Ong(getActivity());
-        Cupom cp = new Cupom();
-
-        File f = new File( uri.getPath() );
-        mediaScanIntent.setData( Uri.fromFile(f) );
-        cp.setOng(ong);
-        cp.setFile(f);
+	    try {
+			Uri uri = Uri.parse(mCurrentPhotoPath);
+		    
+	        Ong ong = new Ong(getActivity());
+	        Cupom cp = new Cupom();
+	
+	        File f = new File( uri.getPath() );
+	        mediaScanIntent.setData( Uri.fromFile(f) );
+	        cp.setOng(ong);
+	        cp.setFile(f);
+	        
+	        MainScreen activity = (MainScreen) getActivity();
+	        cp.setCausaId(activity.getCausaId());
+	        
+	        getActivity().sendBroadcast(mediaScanIntent);
+	        new PostPhoto(getActivity(),this).execute(cp);
+	    } catch(Exception e) {
+	    	/* TODO later
+	    	 * parsing may throw Exceptions that we should proper handle.
+	    	 */
+	    }
         
-        MainScreen activity = (MainScreen) getActivity();
-        cp.setCausaId(activity.getCausaId());
-        
-        getActivity().sendBroadcast(mediaScanIntent);
-        new PostPhoto(getActivity(),this).execute(cp);
 	}
 
 	@Override

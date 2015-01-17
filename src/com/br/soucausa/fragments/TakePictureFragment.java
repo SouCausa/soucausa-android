@@ -9,6 +9,9 @@ import com.br.logsocial.R;
 import com.br.soucausa.MainScreen;
 import com.br.soucausa.background.PostPhoto;
 import com.br.soucausa.callbacks.CallbackPostPhoto;
+import com.br.soucausa.factories.NotificationFactory;
+import com.br.soucausa.factories.ScNotification;
+import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.model.Cupom;
 import com.br.soucausa.model.Ong;
 import com.br.soucausa.util.Constants;
@@ -21,6 +24,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -159,6 +163,7 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 	private void galleryAddPic() {
 
 	    Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+	    Context context = getActivity().getApplicationContext();
 	    
 	    try {
 			Uri uri = Uri.parse(mCurrentPhotoPath);
@@ -180,6 +185,8 @@ public class TakePictureFragment extends Fragment implements CallbackPostPhoto{
 	    	/* TODO later
 	    	 * parsing may throw Exceptions that we should proper handle.
 	    	 */
+	    	ScToastNotification toastNot = (ScToastNotification) NotificationFactory.createNotification(ScNotification.ScType.TOAST);
+			toastNot.doNotify("Ops.. Infelizmente tivemos problemas. Faça uma nova tentantiva", context);
 	    }
         
 	}

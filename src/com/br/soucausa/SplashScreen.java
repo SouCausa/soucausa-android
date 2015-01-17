@@ -25,11 +25,6 @@ public class SplashScreen extends Activity implements CallbackDadoInicial {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_splash_screen);
 		
-		//CODE TEST BLOCK
-			ScStatusBarNotification statusNotification = (ScStatusBarNotification) NotificationFactory.createNotification(ScNotification.ScType.STATUS_BAR);
-			statusNotification.doNotify("Sou Causa","Ol‡ querido amigo, lembre-se de ajudar a sua causa doando sua nota fiscal paulista hoje",this.getApplicationContext());
-		//CODE TEST BLOCK
-		
 		userPref = new UserPreference(this);
 		DeviceInfo deviceInfo = new DeviceInfo(this);
 	

@@ -21,6 +21,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import com.br.soucausa.data.DataContract;
+import com.br.soucausa.factories.NotificationFactory;
+import com.br.soucausa.factories.ScNotification;
+import com.br.soucausa.factories.ScStatusBarNotification;
+import com.br.soucausa.factories.ScToastNotification;
 import com.br.soucausa.util.Constants;
 import com.br.soucausa.util.Pontuacao;
 import com.br.soucausa.util.Settings;
@@ -167,7 +171,9 @@ public class SendPhotoService extends Service {
 				}
 
 			} catch (Exception e) {
-				
+				/* TODO later 
+				 *  handle exceptions properly. 
+				 */
 			} finally {
 				this.countThreads.countDown();
 			}
@@ -201,6 +207,11 @@ public class SendPhotoService extends Service {
 			
 			try {
 				countThreads.await(Constants.UPLOAD_PHOTO_TIMEOUT_INSECONDS,TimeUnit.SECONDS);
+				
+				ScStatusBarNotification statusNotification = (ScStatusBarNotification) NotificationFactory.createNotification(ScNotification.ScType.STATUS_BAR);
+				// put strings in strings.xml file ( later, we are in a hurry )
+				statusNotification.doNotify("Sou Causa","Obrigado. Recebemos sua doação!",this.getApplicationContext());
+				
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			} finally {

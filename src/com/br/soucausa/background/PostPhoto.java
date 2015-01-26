@@ -192,5 +192,6 @@ public class PostPhoto extends AsyncTask<Object, Void, Void> {
 	@Override
 	protected void onPostExecute(Void param){
 		super.onPostExecute(param);
+		this.db.close();
 	}
 }

@@ -16,6 +16,8 @@ public class UserPreference {
 	static final String KEY_DEVICE_ID = "deviceId";
 	static final String KEY_STATUS = "user_status";
 	
+	static final String KEY_REMINDER_TIME = "reminder_time";
+	
 	static final int USER_IMPLICIT = 17;
 	static final int USER_EXPLICIT = 18;
 	
@@ -42,6 +44,10 @@ public class UserPreference {
 			return true;
 		else
 			return false;
+	}
+	
+	public long getReminderTime() {
+		return sharedPreferences.getLong(KEY_REMINDER_TIME, -1);
 	}
 	
 	public String getCausaId() {
@@ -74,6 +80,10 @@ public class UserPreference {
 	
 	public void setUserName(String username) {
 		sharedPreferences.edit().putString(KEY_USER_NAME, username).commit();
+	}
+	
+	public void setReminderTime(long reminderTime) {
+		sharedPreferences.edit().putLong(KEY_REMINDER_TIME, reminderTime).commit();
 	}
 	
 	public void setTipo(int Tipo) {

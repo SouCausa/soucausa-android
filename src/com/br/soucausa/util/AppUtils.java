@@ -1,5 +1,7 @@
 package com.br.soucausa.util;
 
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -12,6 +14,47 @@ public class AppUtils {
 	    ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Activity.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();	    
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	public static boolean isThisTimestampLunchTime(long timestamp) {
+		Calendar time = Calendar.getInstance();
+		time.setTimeInMillis(timestamp);
+		
+		int hour_of_day = time.get( Calendar.HOUR_OF_DAY );
+		
+		if ( ( hour_of_day >= Constants.INITIAL_LUNCH_TIME ) && (hour_of_day <= Constants.EMD_LUNCH_TIME) )		
+			return true;
+		else
+			return false;
+	}
+	
+	public static boolean isNowLunchTime() {
+		Calendar now = Calendar.getInstance();
+		
+		int hour_of_day = now.get( Calendar.HOUR_OF_DAY );
+		
+		if ( ( hour_of_day >= Constants.INITIAL_LUNCH_TIME ) && (hour_of_day <= Constants.EMD_LUNCH_TIME) )		
+			return true;
+		else
+			return false;
+	}
+	
+	public static boolean isThisTimestampToday(long timestamp) {
+		
+		Calendar now = Calendar.getInstance();
+		int currentDayOfMonth = now.get( Calendar.DAY_OF_MONTH );
+		int currentMonth = now.get( Calendar.MONTH );
+		int currentYear = now.get( Calendar.YEAR );
+		
+		now.setTimeInMillis(timestamp);
+		int paramDayOfMonth = now.get( Calendar.DAY_OF_MONTH );
+		int paramMonth = now.get( Calendar.MONTH );
+		int paramYear = now.get( Calendar.YEAR );
+		
+		if ( ( paramDayOfMonth == currentDayOfMonth ) && ( paramMonth == currentMonth )  && ( paramYear == currentYear ) )
+			return true;
+		else
+			return false;
 	}
 	
 	public static boolean isCnpjValido(String cnpj)
